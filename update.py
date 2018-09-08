@@ -1,7 +1,10 @@
 import urllib.request as url
 import json
 import math
-
+try:
+    from geopy.geocoders import Nominatim
+except:
+    pass
 
 def location_query(position):
     location_query_latitude = str(position.get("latitude"))

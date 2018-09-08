@@ -4,10 +4,7 @@ import os
 from databasemanager import Database as Db
 from collections import namedtuple
 import update as f
-try:
-    from geopy.geocoders import Nominatim
-except:
-    pass
+
 
 
 VERSION = 2.1
