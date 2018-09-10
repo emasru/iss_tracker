@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+def mathplotlib_import_error():
+	print("Library mathplotlib not found")
+
 try:
     import matplotlib.pyplot as plt
 except Exception: 
-    for i in range (100):
-        print("dont use plotting method if you dont have the correct lib (mathplotlib)")
+	mathplotlib_import_error()
 class plot: 
     def __init__(self, data_array = None):
         if data_array is None: 
