@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 try:
     import matplotlib.pyplot as plt
 except Exception:
@@ -12,6 +13,6 @@ class plot:
         self.timearray = []
         for row in data_array: 
             self.data.append(row[1])
-            self.timearray.append(row[0])
+            self.timearray.append(datetime.utcfromtimestamp(int(row[0])).strftime('%H:%M:%S'))
         plt.plot(self.timearray, self.data)
         plt.show()
