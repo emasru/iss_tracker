@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 import os
-from databasemanager import Database as Db
+from databaseManager import Database as Db
 from collections import namedtuple
 import update as f
 

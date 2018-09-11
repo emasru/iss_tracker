@@ -1,6 +1,6 @@
-from databasemanager import Database
+from databaseManager import Database
 from os import system
-from plottingcontroller import plot
+from plottingController import plot
 
 d = Database("recorded_positions")
 while True:
