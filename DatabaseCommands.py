@@ -3,4 +3,4 @@
 from databasemanager import Database
 
 d = Database("recorded_positions")
-d.clear_all()
+d.read_from_database()
