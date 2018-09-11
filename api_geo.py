@@ -58,7 +58,6 @@ while True:
         distance_measure = f.distance(position1, position2)
         v = distance_measure / (wait_time * i)
         distance_measure = round(distance_measure, 2)
-        v += 0.35
         v = round(v, 2)
         if wait_time < 10:
             v = None
