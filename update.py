@@ -26,7 +26,7 @@ def distance(origin, destination):  # Measures distance between one global posit
     lon2 = float(destination.get("longitude"))
     # lat1, lon1 = int(origin)
     # lat2, lon2 = int(destination)
-    radius = 6779  # km
+    radius = 6779  # radius of ISS orbit in km
     dlat = math.radians(lat2 - lat1)
     dlon = math.radians(lon2 - lon1)
     a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) \
