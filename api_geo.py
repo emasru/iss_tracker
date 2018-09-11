@@ -6,7 +6,7 @@ from collections import namedtuple
 import update as f
 
 
-VERSION = 2.1
+VERSION = 2.2
 print("ISS Tracker // Author: Henning S. & Birk N.")
 print("Version:", VERSION)
 print("Starting up...")
