@@ -6,6 +6,7 @@ try:
 except:
     pass
 
+
 def location_query(position):
     location_query_latitude = str(position.get("latitude"))
     location_query_longitude = str(position.get("longitude"))
