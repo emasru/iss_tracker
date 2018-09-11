@@ -91,3 +91,4 @@ while True:
             time.sleep(1)  # TODO SOMEHOW MAKE THE FORMATTING SMOOTHER
             countdown = countdown - 1
 print("Shutting down...")
+
