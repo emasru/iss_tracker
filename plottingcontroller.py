@@ -14,5 +14,6 @@ class plot:
         for row in data_array: 
             self.data.append(row[1])
             self.timearray.append(datetime.utcfromtimestamp(int(row[0])).strftime('%H:%M:%S'))
+        plt.figure(figsize=(20,10))
         plt.plot(self.timearray, self.data)
         plt.show()
