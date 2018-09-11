@@ -1,3 +1,8 @@
 # iss_tracker
-Tracks the ISS
-And plots it on a graph
+Tracks the position and velocity of the ISS, saves it in a database and enables it to be plotted into a graph
+
+Executable index:
+
+geo_api - Main program, tracks the ISS and outputs it into a database
+controller - Accesses the database with the run ID provided by geo_api
+DatabaseCommands - under construction 
