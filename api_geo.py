@@ -59,7 +59,7 @@ while True:
         v = distance_measure / (wait_time * i)
         distance_measure = round(distance_measure, 2)
         v = round(v, 2)
-        if wait_time < 10:
+        if wait_time < 5:
             v = None
         os.system("cls")
 
