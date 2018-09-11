@@ -4,6 +4,8 @@ Tracks the position and velocity of the ISS, saves it in a database and enables 
 Executable index:
 
 geo_api - Main program, tracks the ISS and outputs it into a database
+
 controller - Accesses the database with the run ID provided by geo_api
+
 DatabaseCommands - under construction 
 
