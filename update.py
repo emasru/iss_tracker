@@ -12,8 +12,8 @@ def location_query(position):
     location_query_longitude = str(position.get("longitude"))
     try:
         constructed_query = location_query_latitude + "," + location_query_longitude
-        geolocator = Nominatim(user_agent="iss-checker1")
-        location = geolocator.reverse(constructed_query)
+        address = Nominatim(user_agent="iss-checker1")
+        location = address.reverse(constructed_query)
         return location.address
     except:
         pass
