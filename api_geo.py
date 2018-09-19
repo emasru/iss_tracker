@@ -1,7 +1,7 @@
 from datetime import datetime
 import time
 import os
-from databaseManager import Database as Db
+from databasemanager import Database as Db
 from collections import namedtuple
 import urllib.request as url
 import json
@@ -24,6 +24,8 @@ class Tracker:
         self.d = Db("recorded_positions")
         self.id_to_use = self.d.largest_identifier() + 1
         self.i = 0
+        self.location = None
+        self.d = None
 
     def location_query(self, position):
         location_query_latitude = str(position.get("latitude"))
@@ -31,8 +33,8 @@ class Tracker:
         try:
             constructed_query = location_query_latitude + "," + location_query_longitude
             address = Nominatim(user_agent="iss-checker1")
-            location = address.reverse(constructed_query)
-            return location.address
+            self.location = address.reverse(constructed_query)
+
         except:
             pass
 
@@ -50,9 +52,9 @@ class Tracker:
                                                       * math.cos(math.radians(lat2)) * math.sin(dlon / 2) * math.sin(
             dlon / 2)
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        d = radius * c
+        self.d = radius * c
 
-        return d
+
 
     def hemisphere_check(self, position):  # Checks for current hemisphere
         lat = float(position.get("latitude"))
@@ -91,7 +93,8 @@ class Tracker:
                     break
                 position1 = contents.get("iss_position")
                 try:
-                    geo_name = self.location_query(position1)
+                    self.location_query(position1)
+                    geo_name = self.location.address
                 except:
                     pass
                 hemisphere = self.hemisphere_check(position1)
@@ -114,7 +117,8 @@ class Tracker:
                 timestamp = int(contents.get("timestamp"))
                 position2 = contents.get("iss_position")
                 try:
-                    geo_name = self.location_query(position2)  # Fetches the current address
+                    self.location_query(position2)
+                    geo_name = self.location.address  # Fetches the current address
                 except:
                     pass
                 hemisphere = self.hemisphere_check(position2)

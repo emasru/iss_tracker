@@ -4,3 +4,5 @@ __pycache__
 recorded_positions.db
 __pycache__/databasemanager.cpython-36.pyc
 *.pyc
+*.pyc
+recorded_positions.db
