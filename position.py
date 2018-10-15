@@ -12,35 +12,52 @@ import asyncio
 
 INSTANCE = "01"
 
+
 class Position:
     def __init__(self):
-        self.url_data = None
         self.location = "None (International waters)"
         self.hemisphere = "Unknown"
+        self.latitude = 0
+        self.longitude = 0
+        self.api_return = None
+        self.timestamp = None
+        self.date = None
 
-    async def get_status(self):
-        async with aiohttp.ClientSession() as request:
-            async with request.get("http://api.open-notify.org/iss-now.json") as data:
-                self.url_data = json.load(data)  # TODO: find correct way to parse json in aiohttp
+    def time_format(self, utc):
+        if utc is False:
+            self.date = datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+        else:
+            self.date = datetime.utcfromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')  # TODO: giving utc suffix regardless???
+            self.date = self.date + " (UTC)"
 
-    async def data_check(self):
-        if self.url_data is None:
-            await self.get_status()  # TODO: correct use of await?
+    def get_pos(self, utc=bool):  # TODO: http error handling
+        request = url.urlopen("http://api.open-notify.org/iss-now.json").read()
+        loaded = json.loads(request)
+        if loaded["message"] == "success":
+            self.api_return = True
+            self.latitude = float(loaded["iss_position"]["latitude"])
+            self.longitude = float(loaded["iss_position"]["longitude"])
+            self.timestamp = int(loaded["timestamp"])
+            self.time_format(utc)
+        else:
+            self.api_return = False
+    # TODO: find correct way to parse json in aiohttp
 
-    async def location_query(self):
-        self.data_check()
-        latitude = self.url_data.get("latitude")
-        longitude = self.url_data.get("longitude")
+    def api_check(self):
+        if self.api_return is None:
+            self.get_pos()  # TODO: correct use of await?
 
-        query = latitude + "," + longitude
+    def location_query(self):
+        self.api_check()
+
+        query = "%d,%d" % (self.latitude, self.longitude)
         address = Nominatim(user_agent=("iss_checker_unit_%s" % INSTANCE))  # https://bit.ly/2RLDLOA
-        self.location = await address.reverse(query)
+        self.location = address.reverse(str(query))
 
-    def hemisphere(self):
-        self.data_check()
-        lat = float(self.url_data.get("latitude"))
-        lon = float(self.url_data.get("longitude"))
-
+    def get_hemisphere(self):
+        self.api_check()
+        lat = self.latitude
+        lon = self.longitude
         if lat >= 0:
             lat = "NORTH"
         else:
@@ -52,6 +69,30 @@ class Position:
 
         self.hemisphere = lat + " " + lon + " " + "HEMISPHERE"  # TODO: can attributes be declared outside __init__?
 
+    def distance(self, lat, lon):
+        self.api_check()
+        lat1 = float(self.latitude)
+        lon1 = float(self.longitude)
+        lat2 = float(lat)
+        lon2 = float(lon)
+        # lat1, lon1 = int(origin)
+        # lat2, lon2 = int(destination)
+        radius = 6779  # radius of ISS orbit in km
+        dlat = math.radians(lat2 - lat1)
+        dlon = math.radians(lon2 - lon1)
+        a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) \
+            * math.cos(math.radians(lat2)) * math.sin(dlon / 2) * math.sin(
+            dlon / 2)
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        return radius * c
+
+
+# class Calculate(Position):
+  #  def __init__(self):
+   #     Position.__init__(self)
+
+
+
 
 if __name__ == "__main__":
     position = Position()
@@ -59,3 +100,4 @@ if __name__ == "__main__":
     print(position.location)
 
     # TODO: need to create event loop to use methods
+    # TODO: dont add asyncio until end of successful test build
