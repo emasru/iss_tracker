@@ -78,16 +78,12 @@ class Position:
 
         self.hemisphere = lat + " " + lon + " " + "HEMISPHERE"  # TODO: can attributes be declared outside __init__?
 
-    def orbit_distance(self, pos1, pos2):
+    def distance(self, pos1, pos2):
         self.api_check()
-        return distance(pos1, pos2)
-
-    @staticmethod
-    def distance_legacy(pos1, pos2):
-        lat1 = float(pos1[0])
-        lon1 = float(pos1[1])
-        lat2 = float(pos2[0])
-        lon2 = float(pos2[1])
+        lat1 = float(pos1.latitude)
+        lon1 = float(pos1.longitude)
+        lat2 = float(pos2.latitude)
+        lon2 = float(pos2.longitude)
         # lat1, lon1 = int(origin)
         # lat2, lon2 = int(destination)
         radius = 6779  # radius of ISS orbit in km
