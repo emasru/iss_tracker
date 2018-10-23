@@ -6,3 +6,5 @@ __pycache__/databasemanager.cpython-36.pyc
 *.pyc
 *.pyc
 recorded_positions.db
+geopy/
+*.pyc

@@ -7,7 +7,7 @@ import urllib.request as url
 import json
 import math
 from geopy.geocoders import Nominatim
-import aiohttp
+# import aiohttp
 import asyncio
 
 INSTANCE = "01"
@@ -22,6 +22,8 @@ class Position:
         self.api_return = None
         self.timestamp = None
         self.date = None
+        self.coordinates = (self.latitude, self.longitude)
+        self.request_failed = False
 
     def time_format(self, utc):
         if utc is False:
@@ -31,16 +33,20 @@ class Position:
             self.date = self.date + " (UTC)"
 
     def get_pos(self, utc=bool):  # TODO: http error handling
-        request = url.urlopen("http://api.open-notify.org/iss-now.json").read()
-        loaded = json.loads(request)
-        if loaded["message"] == "success":
-            self.api_return = True
-            self.latitude = float(loaded["iss_position"]["latitude"])
-            self.longitude = float(loaded["iss_position"]["longitude"])
-            self.timestamp = int(loaded["timestamp"])
-            self.time_format(utc)
-        else:
-            self.api_return = False
+        try:
+            request = url.urlopen("http://api.open-notify.org/iss-now.json").read()
+            loaded = json.loads(request)
+            if loaded["message"] == "success":
+                self.api_return = True
+                self.latitude = float(loaded["iss_position"]["latitude"])
+                self.longitude = float(loaded["iss_position"]["longitude"])
+                self.timestamp = int(loaded["timestamp"])
+                self.time_format(utc)
+            else:
+                self.api_return = False
+        except url.URLError or url.HTTPError:
+            self.request_failed = True
+
     # TODO: find correct way to parse json in aiohttp
 
     def api_check(self):
@@ -52,7 +58,10 @@ class Position:
 
         query = "%d,%d" % (self.latitude, self.longitude)
         address = Nominatim(user_agent=("iss_checker_unit_%s" % INSTANCE))  # https://bit.ly/2RLDLOA
-        self.location = address.reverse(str(query))
+        try:
+            self.location = str(address.reverse(query))
+        except TypeError:
+            self.location = "None (International waters)"
 
     def get_hemisphere(self):
         self.api_check()
@@ -69,12 +78,16 @@ class Position:
 
         self.hemisphere = lat + " " + lon + " " + "HEMISPHERE"  # TODO: can attributes be declared outside __init__?
 
-    def distance(self, lat, lon):
+    def orbit_distance(self, pos1, pos2):
         self.api_check()
-        lat1 = float(self.latitude)
-        lon1 = float(self.longitude)
-        lat2 = float(lat)
-        lon2 = float(lon)
+        return distance(pos1, pos2)
+
+    @staticmethod
+    def distance_legacy(pos1, pos2):
+        lat1 = float(pos1[0])
+        lon1 = float(pos1[1])
+        lat2 = float(pos2[0])
+        lon2 = float(pos2[1])
         # lat1, lon1 = int(origin)
         # lat2, lon2 = int(destination)
         radius = 6779  # radius of ISS orbit in km
@@ -86,7 +99,6 @@ class Position:
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
         return radius * c
 
-
 # class Calculate(Position):
   #  def __init__(self):
    #     Position.__init__(self)
@@ -96,8 +108,6 @@ class Position:
 
 if __name__ == "__main__":
     position = Position()
-    position.location_query()
-    print(position.location)
 
     # TODO: need to create event loop to use methods
     # TODO: dont add asyncio until end of successful test build

@@ -7,7 +7,6 @@ import urllib.request as url
 import json
 import math
 from geopy.geocoders import Nominatim
-import aiohttp
 import asyncio
 from position import Position
 
@@ -22,11 +21,12 @@ class Tracker:
         self.database_entry = None
         self.utc = False
         self.wait_time = 1
+        self.velocity = 0
 
-    def database(self):
-        self.database_entry = self.data()
-
+    def database(self, position):
+        self.database_entry = self.data(position.timestamp, self.velocity, position.longitude, position.latitude, None)
         # TODO
+
     def run(self):
         print("ISS Tracker // Author: Henning S. & Birk N.")
         print("Version:", self.version)
@@ -43,15 +43,24 @@ class Tracker:
                 if utc_check == "y":
                     self.utc = True
                 print("Tracking first position...")
-                pos1.get_pos(self.utc)
-                pos1.get_hemisphere()
-                pos1.location_query()
-                os.system("cls")
-                print("The current position of the the ISS is Lat:", pos1.latitude, "and Lon:", pos1.longitude, "//", pos1.hemisphere)
-                print("Current address:", pos1.location)  # TODO TypeError: __str__ returned non-string (type NoneType) [search up object documentation]
-                print("Timestamp: ", pos1.date)
+                while True:
+                    start_time = time.time().__float__()
+                    pos1.get_pos(utc=self.utc)
+                    if pos1.request_failed is True:
+                        print("...HTTP request failed...")
+                        break
+                    pos1.get_hemisphere()
+                    pos1.location_query()
+                    os.system("cls")
+                    print("The current position of the the ISS is Lat:", pos1.latitude, "and Lon:", pos1.longitude, "//", pos1.hemisphere)
+                    print("Current address:", pos1.location)  # TODO TypeError: __str__ returned non-string (type NoneType) [search up object documentation]
+                    print("Timestamp: ", pos1.date)
+                    stop_time = time.time().__float__()
+                    elapsed = stop_time - start_time
+                    print("Completion time:", elapsed, "seconds")
+                    time.sleep(self.wait_time)
 
 
 if __name__ == "__main__":
-    tracker = Tracker()
-    tracker.run()
+    app = Tracker()
+    app.run()
